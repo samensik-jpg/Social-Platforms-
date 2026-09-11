@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media English Vocabulary Learning Simulation</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #eef2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        /* Top Platform Selector */
+        .platform-selector-container {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .platform-selector-container h3 {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .platform-bar {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            justify-content: flex-start;
+        }
+
+        .platform-btn {
+            border: 2px solid transparent;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            min-width: 44px;
+            height: 44px;
+        }
+
+        .platform-btn:hover {
+            transform: translateY(-2px);
+            background: #f0f0f0;
+        }
+
+        .platform-btn.active {
+            border-color: #0084ff;
+            background: #e7f1ff;
+            transform: scale(1.05);
+        }
+
+        .platform-btn img, .platform-btn svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* Phone Container Mockup */
+        .phone-mockup {
+            width: 360px;
+            height: 680px;
+            background-color: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+            border: 8px solid #222;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            height: 55px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #dbdbdb;
+            background: #ffffff;
+            color: #000;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            font-size: 20px;
+        }
+
+        /* Scrollable Feed */
+        .feed {
+            flex: 1;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .post {
+            border-bottom: 1px solid #efefef;
+            margin-bottom: 10px;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 240px;
+            background-color: #e1e8ed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            font-size: 22px;
+        }
+
+        .post-likes {
+            padding: 0 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .post-caption {
+            padding: 5px 10px 15px 10px;
+            font-size: 13px;
+        }
+
+        /* Bottom Navigation Bar */
+        .navbar {
+            height: 50px;
+            border-top: 1px solid #dbdbdb;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #ffffff;
+            font-size: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .interactive {
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .interactive:active {
+            transform: scale(0.9);
+        }
+
+        /* Vocab Modal Card */
+        .vocab-card {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            padding: 20px;
+            transition: bottom 0.3s ease-in-out;
+            z-index: 100;
+            border-top: 5px solid #0084ff;
+        }
+
+        .vocab-card.active {
+            bottom: 0;
+        }
+
+        .vocab-card h2 {
+            color: #111;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .vocab-card h3 {
+            color: #0084ff;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .vocab-card p {
+            font-size: 13px;
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .close-btn {
+            background-color: #0084ff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Platform Selector Bar with SVG Logos -->
+    <div class="platform-selector-container">
+        <h3>Select Social Media Platform (選擇社交平台)</h3>
+        <div class="platform-bar">
+            <!-- Instagram -->
+            <button class="platform-btn active" onclick="switchPlatform('instagram')" title="Instagram">
+                <svg viewBox="0 0 24 24"><path fill="#E4405F" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </button>
+            <!-- Facebook -->
+            <button class="platform-btn" onclick="switchPlatform('facebook')" title="Facebook">
+                <svg viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </button>
+            <!-- TikTok -->
+            <button class="platform-btn" onclick="switchPlatform('tiktok')" title="TikTok">
+                <svg viewBox="0 0 24 24"><path fill="#000000" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.31 1.53-1.32 2.53-.02 1.08.57 2.11 1.5 2.63.92.53 2.1.51 3.01-.03.82-.48 1.34-1.39 1.37-2.34.03-3.33.01-6.66.01-9.99-.01-1.94-.01-3.89-.01-5.83z"/></svg>
+            </button>
+            <!-- X / Twitter -->
+            <button class="platform-btn" onclick="switchPlatform('x')" title="X (Twitter)">
+                <svg viewBox="0 0 24 24"><path fill="#000000" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </button>
+            <!-- YouTube -->
+            <button class="platform-btn" onclick="switchPlatform('youtube')" title="YouTube">
+                <svg viewBox="0 0 24 24"><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </button>
+            <!-- LINE -->
+            <button class="platform-btn" onclick="switchPlatform('line')" title="LINE">
+                <svg viewBox="0 0 24 24"><path fill="#00B900" d="M19.34 10.03c0-4.22-4.19-7.65-9.34-7.65S.66 5.81.66 10.03c0 3.78 3.32 6.94 7.81 7.53.3.07.72.2.83.47.09.24.06.62.03.87l-.14.85c-.04.26-.2.1 1.02-.56 1.22-.66 6.58-3.87 8.98-6.62 1.4-1.57 2.15-3.14 2.15-4.54zm-12.83 2.1h-1.6v-3.7h1.6v3.7zm2.7 0h-1.6v-3.7h1.6v3.7zm3.8 0h-1.2l-1.6-2.1v2.1h-1.5v-3.7h1.2l1.6 2.1v-2.1h1.5v3.7zm3.6-2.2h-1.6v.7h1.6v1.5h-3.1v-3.7h3.1v1.5z"/></svg>
+            </button>
+            <!-- Snapchat -->
+            <button class="platform-btn" onclick="switchPlatform('snapchat')" title="Snapchat">
+                <svg viewBox="0 0 24 24"><path fill="#FFFC00" d="M12.003 2c-3.91 0-6.25 2.76-6.25 5.8 0 1.29.39 2.56.88 3.55-.26.43-.9.64-1.39.81-.38.13-.8.27-1.02.62-.22.36-.08.82.26 1.15.58.56 1.43.83 2.21 1.08.13.04.26.08.38.13.09.28.16.89.28 1.45.17.82.42 1.63 1.11 2.17.76.6 1.83.74 2.82.74.39 0 .78-.02 1.17-.08.41.06.8.08 1.2.08.98 0 2.05-.14 2.81-.74.69-.54.94-1.35 1.11-2.17.12-.56.19-1.17.28-1.45.12-.05.25-.09.38-.13.78-.25 1.63-.52 2.21-1.08.34-.33.48-.79.26-1.15-.22-.35-.64-.49-1.02-.62-.49-.17-1.13-.38-1.39-.81.49-.99.88-2.26.88-3.55 0-3.04-2.34-5.8-6.25-5.8z"/></svg>
+            </button>
+            <!-- Threads -->
+            <button class="platform-btn" onclick="switchPlatform('threads')" title="Threads">
+                <svg viewBox="0 0 24 24"><path fill="#000000" d="M12.186 24c-3.186 0-5.875-.98-7.795-2.834-1.802-1.74-2.73-4.14-2.684-6.942.091-5.593 4.192-9.724 10.301-9.724 6.302 0 10.492 4.304 10.492 10.793 0 5.832-3.805 9.707-9.52 9.707-3.046 0-5.46-1.082-6.802-3.046l1.986-1.572c.983 1.442 2.721 2.218 4.816 2.218 4.103 0 6.908-2.787 6.908-7.307 0-4.885-3.046-8.23-7.88-8.23-4.574 0-7.741 3.046-7.812 7.274-.036 2.128.647 3.93 1.966 5.2 1.354 1.305 3.25 1.966 5.482 1.966 1.83 0 3.32-.423 4.43-1.258l1.458 1.932c-1.536 1.152-3.58 1.728-5.888 1.728z"/></svg>
+            </button>
+            <!-- WeChat -->
+            <button class="platform-btn" onclick="switchPlatform('wechat')" title="WeChat">
+                <svg viewBox="0 0 24 24"><path fill="#07C160" d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.06 5.558l-.77 2.341 2.747-1.378c1.112.312 2.302.481 3.535.481.38 0 .753-.021 1.121-.053a7.12 7.12 0 0 1-.183-1.604c0-4.141 3.96-7.5 8.847-7.5.393 0 .778.026 1.157.071C18.665 4.385 14.15 2.188 8.691 2.188zm-2.58 4.293c.602 0 1.09.488 1.09 1.09 0 .602-.488 1.09-1.09 1.09-.602 0-1.09-.488-1.09-1.09 0-.602.488-1.09 1.09-1.09zm5.454 0c.602 0 1.09.488 1.09 1.09 0 .602-.488 1.09-1.09 1.09-.602 0-1.09-.488-1.09-1.09 0-.602.488-1.09 1.09-1.09zM15.5 8.875c-4.141 0-7.5 2.859-7.5 6.386 0 3.527 3.359 6.386 7.5 6.386 1.042 0 2.053-.18 2.981-.508l2.329 1.168-.652-1.983c1.603-1.148 2.592-2.836 2.592-4.713 0-3.527-3.359-6.386-7.5-6.386zm-2.181 3.548c.51 0 .924.414.924.924 0 .51-.414.924-.924.924-.51 0-.924-.414-.924-.924 0-.51.414-.924.924-.924zm4.363 0c.51 0 .924.414.924.924 0 .51-.414.924-.924.924-.51 0-.924-.414-.924-.924 0-.51.414-.924.924-.924z"/></svg>
+            </button>
+            <!-- Twitch -->
+            <button class="platform-btn" onclick="switchPlatform('twitch')" title="Twitch">
+                <svg viewBox="0 0 24 24"><path fill="#9146FF" d="M11.571 4.714h1.715v5.143h-1.715zm4.715 0h1.714v5.143h-1.714zM2.143 0L.429 4.286v15.428h5.143V24l4.286-4.286h3.428L21.857 11.143V0zm18 10.286l-3 3h-4.286l-3 3v-3H5.571V1.714h14.572z"/></svg>
+            </button>
+            <!-- Discord -->
+            <button class="platform-btn" onclick="switchPlatform('discord')" title="Discord">
+                <svg viewBox="0 0 24 24"><path fill="#5865F2" d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.098.245.195.372.288a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.893.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Phone Container Simulation -->
+    <div class="phone-mockup" id="phoneMockup">
+        
+        <!-- App Header -->
+        <div class="header" id="appHeader">
+            <div class="logo" id="appLogo">Instagram</div>
+            <div class="header-icons" id="headerIcons">
+                <!-- Icons injected by JS -->
+            </div>
+        </div>
+
+        <!-- Main Feed Area -->
+        <div class="feed" id="appFeed">
+            <!-- Feed injected by JS -->
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="navbar" id="appNavbar">
+            <!-- Navbar icons injected by JS -->
+        </div>
+
+        <!-- Pop-up Learning Card -->
+        <div class="vocab-card" id="vocabCard">
+            <h2 id="vocabEng">Word Name</h2>
+            <h3 id="vocabChi">中文翻譯</h3>
+            <p><b>Function (功能):</b> <span id="vocabDescEng">Description</span></p>
+            <p><b>說明:</b> <span id="vocabDescChi">中文說明</span></p>
+            <button class="close-btn" id="closeBtn" onclick="closeVocab()">Got it! (我知道了)</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Comprehensive Social Media Database
+        const platforms = {
+            instagram: {
+                name: 'Instagram',
+                themeColor: '#dc2743',
+                headerBg: '#ffffff',
+                headerColor: '#000000',
+                icons: [
+                    { icon: '❤️', term: 'Notifications / Activity', chi: '通知 / 動態', descE: 'Shows when people like your posts or follow you.', descC: '顯示誰按讚你的貼文或追蹤你。' },
+                    { icon: '✈️', term: 'Direct Message (DM)', chi: '私訊', descE: 'Send private messages to your friends.', descC: '傳送私人訊息給你的朋友。' }
+                ],
+                feedType: 'ig',
+                nav: [
+                    { icon: '🏠', term: 'Home Feed', chi: '首頁動態', descE: 'Main page to see all posts.', descC: '主畫面，查看所有追蹤者的貼文。' },
+                    { icon: '🔍', term: 'Search / Explore', chi: '搜尋 / 探索', descE: 'Find new content or friends.', descC: '搜尋朋友或探索新影片。' },
+                    { icon: '➕', term: 'Create / Add Post', chi: '新增貼文', descE: 'Upload new photos or videos.', descC: '上傳新的照片或影片。' },
+                    { icon: '🎬', term: 'Reels', chi: '連續短影片', descE: 'Watch fun short videos.', descC: '觀看有趣簡短的直式短影片。' },
+                    { icon: '👤', term: 'Profile', chi: '個人檔案', descE: 'Your personal account page.', descC: '展示你個人資料的頁面。' }
+                ]
+            },
+            facebook: {
+                name: 'Facebook',
+                themeColor: '#1877F2',
+                headerBg: '#1877F2',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '🔍', term: 'Search', chi: '搜尋', descE: 'Look for friends, pages, or groups.', descC: '搜尋朋友、粉專或社團。' },
+                    { icon: '💬', term: 'Messenger', chi: '即時通訊', descE: 'Chat with your Facebook friends.', descC: '與 Facebook 上的朋友聊天。' }
+                ],
+                feedType: 'fb',
+                nav: [
+                    { icon: '🏠', term: 'News Feed', chi: '動態消息', descE: 'See updates from friends and pages.', descC: '查看好友與關注頁面的最新動態。' },
+                    { icon: '👥', term: 'Friends / Groups', chi: '好友 / 社團', descE: 'Connect with communities and friends.', descC: '加入興趣社團與聯繫朋友。' },
+                    { icon: '📺', term: 'Watch / Video', chi: '影音專區', descE: 'Watch long or short videos.', descC: '觀看各類推薦影片。' },
+                    { icon: '🔔', term: 'Notifications', chi: '通知', descE: 'Alerts for likes, comments, and tags.', descC: '有最新的按讚、留言或標記提醒。' },
+                    { icon: '☰', term: 'Menu', chi: '選單', descE: 'Settings, saved posts, and profile.', descC: '查看設定、儲存的內容與個人頁面。' }
+                ]
+            },
+            tiktok: {
+                name: 'TikTok',
+                themeColor: '#fe2c55',
+                headerBg: '#000000',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '📺', term: 'LIVE', chi: '直播', descE: 'Watch real-time broadcasts.', descC: '觀看創作者的即時直播。' },
+                    { icon: '🔍', term: 'Search', chi: '搜尋', descE: 'Search trending videos and sounds.', descC: '搜尋熱門影片與流行音樂。' }
+                ],
+                feedType: 'tiktok',
+                nav: [
+                    { icon: '🏠', term: 'Home Feed', chi: '首頁', descE: 'Watch recommended videos (For You).', descC: '瀏覽推薦給你的精彩短影片。' },
+                    { icon: '⚡', term: 'Now / Friends', chi: '朋友動態', descE: 'See videos made by your friends.', descC: '觀看好友們發布的影片。' },
+                    { icon: '➕', term: 'Record / Upload', chi: '拍攝 / 上傳', descE: 'Record a video with cool filters.', descC: '拍攝並加上特效上傳影片。' },
+                    { icon: '📥', term: 'Inbox', chi: '收件匣', descE: 'Messages and notifications.', descC: '查看訊息與所有通知。' },
+                    { icon: '👤', term: 'Profile', chi: '個人主頁', descE: 'Your uploaded videos and likes.', descC: '管理你的作品與喜歡的影片。' }
+                ]
+            },
+            x: {
+                name: 'X (Twitter)',
+                themeColor: '#000000',
+                headerBg: '#ffffff',
+                headerColor: '#000000',
+                icons: [
+                    { icon: '⚙️', term: 'Settings', chi: '設定', descE: 'Manage your app configuration.', descC: '管理你的帳號與應用程式設定。' }
+                ],
+                feedType: 'x',
+                nav: [
+                    { icon: '🏠', term: 'Home Timeline', chi: '主頁時間軸', descE: 'Read short posts (Tweets/Posts).', descC: '瀏覽最新的簡短文字動態。' },
+                    { icon: '🔍', term: 'Search / Trends', chi: '搜尋 / 趨勢', descE: 'See what topic is trending now.', descC: '查看當前最熱門的世界話題。' },
+                    { icon: '🎙️', term: 'Spaces', chi: '語音空間', descE: 'Listen to live audio conversations.', descC: '加入即時語音對話房間。' },
+                    { icon: '🔔', term: 'Notifications', chi: '通知', descE: 'Mentions and repost updates.', descC: '查看提提及轉發等動態。' },
+                    { icon: '✉️', term: 'Direct Messages', chi: '私訊', descE: 'Private messaging channel.', descC: '一對一私人訊息通訊。' }
+                ]
+            },
+            youtube: {
+                name: 'YouTube',
+                themeColor: '#FF0000',
+                headerBg: '#ffffff',
+                headerColor: '#000000',
+                icons: [
+                    { icon: '📡', term: 'Cast Screen', chi: '投放畫面', descE: 'Connect video to TV.', descC: '將影片畫面同步投影至電視。' },
+                    { icon: '🔔', term: 'Notifications', chi: '通知', descE: 'Updates from subscribed channels.', descC: '來自已訂閱頻道的新片通知。' }
+                ],
+                feedType: 'youtube',
+                nav: [
+                    { icon: '🏠', term: 'Home', chi: '首頁', descE: 'Recommended video feed.', descC: '為你推薦的各類影片首頁。' },
+                    { icon: '🩳', term: 'Shorts', chi: 'Shorts 短影音', descE: 'Watch short vertical videos.', descC: '刷看直式短影片。' },
+                    { icon: '➕', term: 'Upload', chi: '建立 / 上傳', descE: 'Create video or go live.', descC: '上傳新影片或開始直播。' },
+                    { icon: '📺', term: 'Subscriptions', chi: '訂閱內容', descE: 'Videos from creators you follow.', descC: '查看你訂閱創作者的最新作品。' },
+                    { icon: '📁', term: 'Library / You', chi: '個人庫', descE: 'Watch history and playlists.', descC: '歷史播放紀錄與儲存的播放清單。' }
+                ]
+            },
+            line: {
+                name: 'LINE',
+                themeColor: '#00B900',
+                headerBg: '#00B900',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '🔍', term: 'Search', chi: '搜尋', descE: 'Find chats or contacts.', descC: '搜尋好友或聊天紀錄。' },
+                    { icon: '⚙️', term: 'Settings', chi: '設定', descE: 'Change theme and chat options.', descC: '調整個人與聊天室設定。' }
+                ],
+                feedType: 'line',
+                nav: [
+                    { icon: '🏠', term: 'Home Tab', chi: '主頁', descE: 'Friends list and services.', descC: '好友列表與所有官方服務。' },
+                    { icon: '💬', term: 'Chats', chi: '聊天室', descE: 'Messages with friends and groups.', descC: '與朋友或群組傳訊息聊天。' },
+                    { icon: '⏱️', term: 'VOOM (Timeline)', chi: 'VOOM 貼文串', descE: 'Short videos and post updates.', descC: '瀏覽短影片與朋友動態。' },
+                    { icon: '📰', term: 'News', chi: '新聞', descE: 'Read everyday top news.', descC: '閱讀最新每日焦點新聞。' },
+                    { icon: '👛', term: 'Wallet', chi: '錢包', descE: 'Mobile pay and points.', descC: '行動支付與點數功能。' }
+                ]
+            },
+            snapchat: {
+                name: 'Snapchat',
+                themeColor: '#FFFC00',
+                headerBg: '#000000',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '👤', term: 'Profile', chi: '個人檔案', descE: 'Bitmoji and account details.', descC: '查看形象虛擬人偶與帳號。' },
+                    { icon: '🔍', term: 'Search', chi: '搜尋', descE: 'Find Snaps and stories.', descC: '搜尋朋友或精彩動態。' }
+                ],
+                feedType: 'snapchat',
+                nav: [
+                    { icon: '🗺️', term: 'Snap Map', chi: '地圖', descE: 'See where your friends are.', descC: '在世界地圖上尋找好友的位置。' },
+                    { icon: '💬', term: 'Chat', chi: '聊天', descE: 'Send disappearing text or photos.', descC: '傳送會自動消失的訊息與照片。' },
+                    { icon: '📷', term: 'Camera', chi: '相機', descE: 'Take a picture with fun filters.', descC: '使用趣味濾鏡拍下精彩照片。' },
+                    { icon: '👥', term: 'Stories', chi: '故事', descE: 'Watch daily story updates.', descC: '觀看好友與熱門人物的日常故事。' },
+                    { icon: 'PLAY', term: 'Spotlight', chi: '聚光燈', descE: 'Watch viral short video Snaps.', descC: '欣賞社群中最熱門的短影片。' }
+                ]
+            },
+            threads: {
+                name: 'Threads',
+                themeColor: '#000000',
+                headerBg: '#ffffff',
+                headerColor: '#000000',
+                icons: [
+                    { icon: '🌐', term: 'Fediverse', chi: '聯邦宇宙', descE: 'Decentralized social feature.', descC: '跨平台的社群連線功能。' }
+                ],
+                feedType: 'threads',
+                nav: [
+                    { icon: '🏠', term: 'Home Feed', chi: '首頁', descE: 'Read textual posts and discussions.', descC: '瀏覽大眾對話題的文字討論。' },
+                    { icon: '🔍', term: 'Search', chi: '搜尋', descE: 'Discover popular ideas and topics.', descC: '尋找熱門議題或追蹤對象。' },
+                    { icon: '📝', term: 'New Thread', chi: '發布串文', descE: 'Post a text update or photo.', descC: '撰寫新的文字串文或分享照片。' },
+                    { icon: '❤️', term: 'Activity', chi: '動態通知', descE: 'Replies, mentions, and likes.', descC: '回覆、標記與按讚互動動態。' },
+                    { icon: '👤', term: 'Profile', chi: '個人檔案', descE: 'Your threads and replies list.', descC: '查看你個人發布過的所有串文。' }
+                ]
+            },
+            wechat: {
+                name: 'WeChat',
+                themeColor: '#07C160',
+                headerBg: '#07C160',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '🔍', term: 'Search', chi: '搜尋', descE: 'Search articles or friends.', descC: '搜尋好友、文章或小程序。' },
+                    { icon: '➕', term: 'Add / Plus', chi: '功能選單', descE: 'Add friends, scan QR code.', descC: '新增好友、掃一掃或發起群聊。' }
+                ],
+                feedType: 'wechat',
+                nav: [
+                    { icon: '💬', term: 'Chats', chi: '微信聊天', descE: 'Conversations with contacts.', descC: '查看好友對話與群組訊息。' },
+                    { icon: '👥', term: 'Contacts', chi: '通訊錄', descE: 'List of your friends.', descC: '檢視通訊錄好友名單。' },
+                    { icon: '🧭', term: 'Discover', chi: '發現', descE: 'Moments, channels, and scan.', descC: '包含朋友圈、視頻號與掃一掃。' },
+                    { icon: '👤', term: 'Me', chi: '我', descE: 'Pay wallet, settings, and profile.', descC: '包含個人頁面、服務與支付錢包。' }
+                ]
+            },
+            twitch: {
+                name: 'Twitch',
+                themeColor: '#9146FF',
+                headerBg: '#9146FF',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '📡', term: 'Broadcast', chi: '開播', descE: 'Start streaming live.', descC: '開啟你自己的實況直播。' },
+                    { icon: '💬', term: 'Whisper', chi: '悄悄話', descE: 'Private chat with users.', descC: '與其他玩家一對一私訊。' }
+                ],
+                feedType: 'twitch',
+                nav: [
+                    { icon: '👁️', term: 'Following', chi: '追蹤中', descE: 'Channels you follow that are live.', descC: '正在直播的已追蹤頻道。' },
+                    { icon: '🧭', term: 'Discover', chi: '探索', descE: 'Find live streams by category.', descC: '按遊戲分類尋找新實況。' },
+                    { icon: '🎮', term: 'Browse', chi: '瀏覽', descE: 'Browse trending games and channels.', descC: '瀏覽熱門遊戲話題與分類。' }
+                ]
+            },
+            discord: {
+                name: 'Discord',
+                themeColor: '#5865F2',
+                headerBg: '#5865F2',
+                headerColor: '#ffffff',
+                icons: [
+                    { icon: '🔍', term: 'Find / Search', chi: '尋找', descE: 'Search channels and text.', descC: '搜尋伺服器頻道或歷史對話。' }
+                ],
+                feedType: 'discord',
+                nav: [
+                    { icon: '👾', term: 'Servers', chi: '伺服器', descE: 'Communities you are part of.', descC: '你加入的所有主題遊戲社群。' },
+                    { icon: '💬', term: 'Direct Messages', chi: '私訊 / 好友', descE: 'Friend list and private chats.', descC: '查看好友名單與私訊對話。' },
+                    { icon: '🔊', term: 'Voice Channel', chi: '語音頻道', descE: 'Talk live with friends using mic.', descC: '用語音與朋友同步線上對談。' },
+                    { icon: '⚙️', term: 'User Settings', chi: '使用者設定', descE: 'Configure mic, theme, and profile.', descC: '設定麥克風、外觀與個人資料。' }
+                ]
+            }
+        };
+
+        let currentPlatform = 'instagram';
+
+        function switchPlatform(key) {
+            currentPlatform = key;
+            const data = platforms[key];
+
+            // Update Active Button
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Set Header Styling
+            const header = document.getElementById('appHeader');
+            header.style.background = data.headerBg;
+            header.style.color = data.headerColor;
+            document.getElementById('appLogo').innerText = data.name;
+
+            // Render Header Icons
+            const headerIconsDiv = document.getElementById('headerIcons');
+            headerIconsDiv.innerHTML = data.icons.map(i => 
+                `<span class="interactive" onclick="showVocab('${i.term}', '${i.chi}', '${i.descE}', '${i.descC}')">${i.icon}</span>`
+            ).join('');
+
+            // Render Nav Bar
+            const navbar = document.getElementById('appNavbar');
+            navbar.innerHTML = data.nav.map(n => 
+                `<span class="interactive" onclick="showVocab('${n.term}', '${n.chi}', '${n.descE}', '${n.descC}')">${n.icon}</span>`
+            ).join('');
+
+            // Update Vocab Card Theme Border/Btn
+            document.getElementById('vocabCard').style.borderColor = data.themeColor;
+            document.getElementById('closeBtn').style.backgroundColor = data.themeColor;
+
+            // Render Feed Content based on platform
+            renderFeed(key, data.themeColor);
+        }
+
+        function renderFeed(key, themeColor) {
+            const feed = document.getElementById('appFeed');
+            
+            feed.innerHTML = `
+                <div class="post">
+                    <div class="post-header">
+                        <div class="user-avatar" style="background-color: ${themeColor}; color: white;">🎓</div>
+                        <span>english_class_student</span>
+                    </div>
+                    <div class="post-image interactive" onclick="showVocab('Post Content / Media', '貼文內容 / 媒體', 'Shared picture or live screen content.', '分享的照片或動態主內容。')">
+                        📱
+                    </div>
+                    <div class="post-actions">
+                        <span class="interactive" onclick="showVocab('Like / Reaction', '讚 / 互動表情', 'Express feelings on the post.', '表達對內容的喜愛或回應。')">❤️</span>
+                        <span class="interactive" onclick="showVocab('Comment / Reply', '留言 / 回覆', 'Write your thoughts.', '寫下回應與其他同伴討論。')">💬</span>
+                        <span class="interactive" onclick="showVocab('Share / Forward', '分享 / 轉發', 'Send to other platforms or chats.', '將此內容分享給其他好友。')">🚀</span>
+                    </div>
+                    <div class="post-likes interactive" onclick="showVocab('Engagement Count', '互動數據', 'Shows total likes or views.', '顯示觀看總數與互動數據。')">
+                        👍 248 Likes / Reactions
+                    </div>
+                    <div class="post-caption">
+                        <b>english_class_student</b> Learning English social media vocabulary is super easy! 🌟
+                    </div>
+                </div>
+            `;
+        }
+
+        function showVocab(english, chinese, descEng, descChi) {
+            document.getElementById('vocabEng').innerText = english;
+            document.getElementById('vocabChi').innerText = chinese;
+            document.getElementById('vocabDescEng').innerText = descEng;
+            document.getElementById('vocabDescChi').innerText = descChi;
+            document.getElementById('vocabCard').classList.add('active');
+        }
+
+        function closeVocab() {
+            document.getElementById('vocabCard').classList.remove('active');
+        }
+
+        // Initialize with default platform (Instagram)
+        window.onload = function() {
+            switchPlatform('instagram');
+            document.querySelector('.platform-btn').classList.add('active');
+        };
+    </script>
+</body>
+</html>
